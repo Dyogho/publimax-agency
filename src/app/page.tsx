@@ -1,6 +1,16 @@
 import Image from "next/image";
+import prisma from "@/lib/prisma";
 
-export default function Home() {
+export default async function Home() {
+  let isConnected = false;
+  try {
+    // Intento de consulta simple para verificar conexión
+    await prisma.$queryRaw`SELECT 1`;
+    isConnected = true;
+  } catch (e) {
+    console.error("Database connection failed:", e);
+  }
+
   return (
     <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
       <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
@@ -14,24 +24,18 @@ export default function Home() {
         />
         <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
           <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
+            PubliMax Marketing Digital
           </h1>
+          <div className="mt-4 p-4 rounded-lg bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800">
+            <p className="text-sm font-medium">
+              Estado de Base de Datos: 
+              <span className={isConnected ? "text-green-600 ml-2" : "text-red-600 ml-2"}>
+                {isConnected ? "Conectado (Prisma)" : "Error de Conexión"}
+              </span>
+            </p>
+          </div>
           <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+            Sistema de Gestión de Campañas y Creativos iniciado con éxito.
           </p>
         </div>
         <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">

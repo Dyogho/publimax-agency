@@ -3,9 +3,11 @@ import prisma from "@/lib/prisma";
 
 export default async function Home() {
   let isConnected = false;
+  let clientCount = 0;
   try {
-    // Intento de consulta simple para verificar conexión
+    // Verificación de conexión y acceso a modelos
     await prisma.$queryRaw`SELECT 1`;
+    clientCount = await prisma.client.count();
     isConnected = true;
   } catch (e) {
     console.error("Database connection failed:", e);
@@ -30,7 +32,7 @@ export default async function Home() {
             <p className="text-sm font-medium">
               Estado de Base de Datos: 
               <span className={isConnected ? "text-green-600 ml-2" : "text-red-600 ml-2"}>
-                {isConnected ? "Conectado (Prisma)" : "Error de Conexión"}
+                {isConnected ? `Conectado (Clientes: ${clientCount})` : "Error de Conexión"}
               </span>
             </p>
           </div>

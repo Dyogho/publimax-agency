@@ -1,8 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Get a free hosted Postgres database in seconds: `npx create-db`
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -11,4 +6,100 @@ datasource db {
   provider  = "postgresql"
   url       = env("DATABASE_URL")
   directUrl = env("DIRECT_URL")
+}
+
+enum CampaignStatus {
+  PLANNING
+  ACTIVE
+  PAUSED
+  COMPLETED
+}
+
+enum DeliverableType {
+  BANNER
+  VIDEO
+  COPY
+}
+
+enum DeliverableStatus {
+  PENDING
+  REVIEW
+  APPROVED
+}
+
+enum InvoiceStatus {
+  PENDING
+  PAID
+  CANCELLED
+}
+
+model Client {
+  id        String     @id @default(cuid())
+  name      String
+  email     String     @unique
+  phone     String?
+  address   String?
+  campaigns Campaign[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+}
+
+model Campaign {
+  id           String         @id @default(cuid())
+  name         String
+  budget       Float
+  adsType      String
+  startDate    DateTime
+  endDate      DateTime
+  estimatedRoi Float?
+  status       CampaignStatus @default(PLANNING)
+  clientId     String
+  client       Client         @relation(fields: [clientId], references: [id])
+  deliverables Deliverable[]
+  teamMembers  TeamMember[]
+  invoices     Invoice[]
+  moodboards   Moodboard[]
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+}
+
+model Deliverable {
+  id         String            @id @default(cuid())
+  title      String
+  type       DeliverableType
+  status     DeliverableStatus @default(PENDING)
+  campaignId String
+  campaign   Campaign          @relation(fields: [campaignId], references: [id])
+  createdAt  DateTime          @default(now())
+  updatedAt  DateTime          @updatedAt
+}
+
+model TeamMember {
+  id        String     @id @default(cuid())
+  name      String
+  role      String
+  campaigns Campaign[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+}
+
+model Invoice {
+  id         String        @id @default(cuid())
+  amount     Float
+  dueDate    DateTime
+  status     InvoiceStatus @default(PENDING)
+  campaignId String
+  campaign   Campaign      @relation(fields: [campaignId], references: [id])
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
+}
+
+model Moodboard {
+  id         String   @id @default(cuid())
+  title      String
+  urls       String[] // Array of reference links
+  campaignId String
+  campaign   Campaign @relation(fields: [campaignId], references: [id])
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 }

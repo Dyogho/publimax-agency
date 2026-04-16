@@ -2,14 +2,13 @@
 
 import { useState } from "react";
 import { CampaignForm } from "./campaign-form";
-import { type Client, type Team } from "@prisma/client";
+import { type Client } from "@prisma/client";
 
 interface NewCampaignButtonProps {
   clients: Client[];
-  teams: Team[];
 }
 
-export function NewCampaignButton({ clients, teams }: NewCampaignButtonProps) {
+export function NewCampaignButton({ clients }: NewCampaignButtonProps) {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -37,7 +36,7 @@ export function NewCampaignButton({ clients, teams }: NewCampaignButtonProps) {
                 ✕
               </button>
             </div>
-            <CampaignForm clients={clients} teams={teams} onSuccess={() => setIsOpen(false)} />
+            <CampaignForm clients={clients} onSuccess={() => setIsOpen(false)} />
           </div>
         </div>
       )}

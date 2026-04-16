@@ -30,12 +30,13 @@ export function ClientForm({ client, onSuccess }: ClientFormProps) {
       ? await updateClient(client.id, data) 
       : await createClient(data);
 
-    if (result.success) {
+    if ("success" in result && result.success) {
       onSuccess?.();
       return { success: true, error: undefined };
     }
 
-    return { success: false, error: result.error as string | Record<string, string[]> };
+    const error = "error" in result ? result.error : "Unknown error";
+    return { success: false, error: error as string | Record<string, string[]> };
   }
 
   const [state, formAction, isPending] = useActionState(handleSubmit, null);

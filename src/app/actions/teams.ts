@@ -4,6 +4,7 @@ import prisma from "@/lib/prisma";
 import { memberSchema, teamSchema, type MemberInput, type TeamInput } from "@/lib/validations/team";
 import { revalidatePath } from "next/cache";
 import { formatActionError } from "@/lib/utils/errors";
+import { createAdminClient } from "@/lib/supabase/server";
 
 /* --- Team Members Actions --- */
 
@@ -13,13 +14,47 @@ export async function createMember(data: MemberInput) {
     return formatActionError(result.error);
   }
 
+  const { name, email, password, role, systemRole } = result.data;
+
   try {
-    const member = await prisma.teamMember.create({ data: result.data });
-    revalidatePath("/team");
-    return { success: true, data: member };
+    // 1. Create user in Supabase Auth via Admin API
+    const supabaseAdmin = await createAdminClient();
+    const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
+      email,
+      password,
+      email_confirm: true,
+      user_metadata: { name, role: systemRole },
+    });
+
+    if (authError) {
+      console.error("Supabase Auth Error:", authError);
+      return { error: authError.message };
+    }
+
+    // 2. Create profile in Prisma
+    try {
+      const member = await prisma.teamMember.create({
+        data: {
+          name,
+          email,
+          password,
+          role,
+          systemRole,
+        },
+      });
+
+      revalidatePath("/team");
+      revalidatePath("/teams");
+      return { success: true, data: member };
+    } catch (dbError) {
+      console.error("Database Error:", dbError);
+      // Cleanup: Delete auth user if DB creation fails
+      await supabaseAdmin.auth.admin.deleteUser(authData.user.id);
+      return { error: "Failed to create profile in database." };
+    }
   } catch (e) {
-    console.error(e);
-    return { error: "Failed to create member." };
+    console.error("Unexpected Error:", e);
+    return { error: "An unexpected error occurred during creation." };
   }
 }
 

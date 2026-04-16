@@ -12,10 +12,15 @@ interface CampaignFormProps {
   onSuccess?: () => void;
 }
 
+type FormState = {
+  success?: boolean;
+  error?: string | Record<string, string[]>;
+} | null;
+
 export function CampaignForm({ clients, teams, campaign, onSuccess }: CampaignFormProps) {
   const isEditing = !!campaign;
 
-  async function handleSubmit(prevState: any, formData: FormData) {
+  async function handleSubmit(prevState: FormState, formData: FormData): Promise<FormState> {
     const selectedTeams = formData.getAll("teams") as string[];
 
     const data: CampaignInput & { teamIds: string[] } = {
@@ -29,17 +34,16 @@ export function CampaignForm({ clients, teams, campaign, onSuccess }: CampaignFo
       teamIds: selectedTeams,
     };
 
-    // Note: We'll need to update the action to handle teamIds
     const result = isEditing 
-      ? await updateCampaign(campaign.id, data as any) 
-      : await createCampaign(data as any);
+      ? await updateCampaign(campaign.id, data) 
+      : await createCampaign(data);
 
     if (result.success) {
       onSuccess?.();
-      return { success: true, error: null };
+      return { success: true, error: undefined };
     }
 
-    return { success: false, error: result.error };
+    return { success: false, error: result.error as string | Record<string, string[]> };
   }
 
   const [state, formAction, isPending] = useActionState(handleSubmit, null);

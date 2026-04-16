@@ -39,8 +39,11 @@ export async function createTeam(data: TeamInput) {
   if (!result.success) return { error: result.error.flatten().fieldErrors };
 
   try {
-    const team = await prisma.team.create({ 
-      data: result.data as any 
+    const team = await prisma.team.create({
+      data: {
+        name: result.data.name,
+        description: result.data.description || null,
+      }
     });
     revalidatePath("/teams");
     return { success: true, data: team };
@@ -57,7 +60,10 @@ export async function updateTeam(id: string, data: TeamInput) {
   try {
     const team = await prisma.team.update({
       where: { id },
-      data: result.data as any,
+      data: {
+        name: result.data.name,
+        description: result.data.description || null,
+      },
     });
     revalidatePath("/teams");
     return { success: true, data: team };

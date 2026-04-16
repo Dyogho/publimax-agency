@@ -87,7 +87,6 @@ model Team {
   id          String       @id @default(cuid())
   name        String
   description String?
-  metadata    Json?
   members     TeamMember[] @relation("TeamMembership")
   campaigns   Campaign[]   @relation("TeamCampaigns")
   createdAt   DateTime     @default(now())

@@ -10,10 +10,15 @@ interface ClientFormProps {
   onSuccess?: () => void;
 }
 
+type FormState = {
+  success?: boolean;
+  error?: string | Record<string, string[]>;
+} | null;
+
 export function ClientForm({ client, onSuccess }: ClientFormProps) {
   const isEditing = !!client;
 
-  async function handleSubmit(prevState: any, formData: FormData) {
+  async function handleSubmit(prevState: FormState, formData: FormData): Promise<FormState> {
     const data: ClientInput = {
       name: formData.get("name") as string,
       email: formData.get("email") as string,
@@ -27,10 +32,10 @@ export function ClientForm({ client, onSuccess }: ClientFormProps) {
 
     if (result.success) {
       onSuccess?.();
-      return { success: true, error: null };
+      return { success: true, error: undefined };
     }
 
-    return { success: false, error: result.error };
+    return { success: false, error: result.error as string | Record<string, string[]> };
   }
 
   const [state, formAction, isPending] = useActionState(handleSubmit, null);

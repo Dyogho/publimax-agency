@@ -10,10 +10,15 @@ interface TeamFormProps {
   onSuccess?: () => void;
 }
 
+type FormState = {
+  success?: boolean;
+  error?: string | Record<string, string[]>;
+} | null;
+
 export function TeamForm({ team, onSuccess }: TeamFormProps) {
   const isEditing = !!team;
 
-  async function handleSubmit(prevState: any, formData: FormData) {
+  async function handleSubmit(prevState: FormState, formData: FormData): Promise<FormState> {
     const data: TeamInput = {
       name: formData.get("name") as string,
       description: formData.get("description") as string,
@@ -25,10 +30,10 @@ export function TeamForm({ team, onSuccess }: TeamFormProps) {
 
     if (result.success) {
       onSuccess?.();
-      return { success: true, error: null };
+      return { success: true, error: undefined };
     }
 
-    return { success: false, error: result.error };
+    return { success: false, error: result.error as string | Record<string, string[]> };
   }
 
   const [state, formAction, isPending] = useActionState(handleSubmit, null);

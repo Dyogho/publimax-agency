@@ -43,8 +43,8 @@ export async function createMember(data: MemberInput) {
         },
       });
 
-      revalidatePath("/team");
-      revalidatePath("/teams");
+      revalidatePath("/admin/team");
+      revalidatePath("/admin/teams");
       return { success: true, data: member };
     } catch (dbError) {
       console.error("Database Error:", dbError);
@@ -62,7 +62,7 @@ export async function deleteMember(id: string) {
   try {
     await prisma.teamMember.delete({ where: { id } });
     revalidatePath("/team");
-    revalidatePath("/teams");
+    revalidatePath("/admin/teams");
     return { success: true };
   } catch (e) {
     console.error(e);
@@ -85,7 +85,7 @@ export async function createTeam(data: TeamInput) {
         description: result.data.description || null,
       }
     });
-    revalidatePath("/teams");
+    revalidatePath("/admin/teams");
     return { success: true, data: team };
   } catch (e) {
     console.error(e);
@@ -107,7 +107,7 @@ export async function updateTeam(id: string, data: TeamInput) {
         description: result.data.description || null,
       },
     });
-    revalidatePath("/teams");
+    revalidatePath("/admin/teams");
     return { success: true, data: team };
   } catch (e) {
     console.error(e);
@@ -118,7 +118,7 @@ export async function updateTeam(id: string, data: TeamInput) {
 export async function deleteTeam(id: string) {
   try {
     await prisma.team.delete({ where: { id } });
-    revalidatePath("/teams");
+    revalidatePath("/admin/teams");
     revalidatePath("/campaigns");
     return { success: true };
   } catch (e) {
@@ -139,7 +139,7 @@ export async function addMemberToTeam(teamId: string, memberId: string) {
         }
       }
     });
-    revalidatePath("/teams");
+    revalidatePath("/admin/teams");
     return { success: true };
   } catch (e) {
     console.error(e);
@@ -157,7 +157,7 @@ export async function removeMemberFromTeam(teamId: string, memberId: string) {
         }
       }
     });
-    revalidatePath("/teams");
+    revalidatePath("/admin/teams");
     return { success: true };
   } catch (e) {
     console.error(e);

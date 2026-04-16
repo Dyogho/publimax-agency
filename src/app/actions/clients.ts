@@ -16,8 +16,8 @@ export async function createClient(data: ClientInput) {
     const client = await prisma.client.create({
       data: result.data,
     });
-    revalidatePath("/dashboard");
-    revalidatePath("/clients");
+    revalidatePath("/admin");
+    revalidatePath("/admin/clients");
     return { success: true, data: client };
   } catch (e) {
     console.error("Error creating client:", e);
@@ -37,8 +37,8 @@ export async function updateClient(id: string, data: ClientInput) {
       where: { id },
       data: result.data,
     });
-    revalidatePath("/dashboard");
-    revalidatePath("/clients");
+    revalidatePath("/admin");
+    revalidatePath("/admin/clients");
     return { success: true, data: client };
   } catch (e) {
     console.error("Error updating client:", e);
@@ -51,8 +51,8 @@ export async function deleteClient(id: string) {
     await prisma.client.delete({
       where: { id },
     });
-    revalidatePath("/dashboard");
-    revalidatePath("/clients");
+    revalidatePath("/admin");
+    revalidatePath("/admin/clients");
     return { success: true };
   } catch (e) {
     console.error("Error deleting client:", e);

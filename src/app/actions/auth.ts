@@ -32,7 +32,7 @@ export async function login(prevState: any, formData: FormData) {
     return { error: "Error al obtener perfil de usuario" };
   }
 
-  let redirectPath = "/dashboard";
+  let redirectPath = "/admin";
   try {
     const member = await prisma.teamMember.findUnique({
       where: { email: user.email },
@@ -40,7 +40,7 @@ export async function login(prevState: any, formData: FormData) {
     });
 
     if (member && member.systemRole === "CREATIVE") {
-      redirectPath = "/calendar";
+      redirectPath = "/creative";
     }
   } catch (error) {
     console.error("Redirection Error:", error);

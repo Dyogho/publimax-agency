@@ -1,4 +1,5 @@
-export default function CalendarPage() {
+export default async function CalendarPage() {
+  'use cache';
   return (
     <div className="flex flex-col h-full bg-white dark:bg-black rounded-2xl border border-zinc-200 dark:border-zinc-800 overflow-hidden">
       {/* Header del Calendario */}

@@ -16,8 +16,8 @@ export async function createCampaign(data: CampaignInput) {
     const campaign = await prisma.campaign.create({
       data: result.data,
     });
-    revalidatePath("/dashboard");
-    revalidatePath("/campaigns");
+    revalidatePath("/admin");
+    revalidatePath("/admin/campaigns");
     return { success: true, data: campaign };
   } catch (e) {
     console.error("Error creating campaign:", e);
@@ -37,8 +37,8 @@ export async function updateCampaign(id: string, data: CampaignInput) {
       where: { id },
       data: result.data,
     });
-    revalidatePath("/dashboard");
-    revalidatePath("/campaigns");
+    revalidatePath("/admin");
+    revalidatePath("/admin/campaigns");
     return { success: true, data: campaign };
   } catch (e) {
     console.error("Error updating campaign:", e);
@@ -51,8 +51,8 @@ export async function deleteCampaign(id: string) {
     await prisma.campaign.delete({
       where: { id },
     });
-    revalidatePath("/dashboard");
-    revalidatePath("/campaigns");
+    revalidatePath("/admin");
+    revalidatePath("/admin/campaigns");
     return { success: true };
   } catch (e) {
     console.error("Error deleting campaign:", e);

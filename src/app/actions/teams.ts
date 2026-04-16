@@ -3,12 +3,15 @@
 import prisma from "@/lib/prisma";
 import { memberSchema, teamSchema, type MemberInput, type TeamInput } from "@/lib/validations/team";
 import { revalidatePath } from "next/cache";
+import { formatActionError } from "@/lib/utils/errors";
 
 /* --- Team Members Actions --- */
 
 export async function createMember(data: MemberInput) {
   const result = memberSchema.safeParse(data);
-  if (!result.success) return { error: result.error.flatten().fieldErrors };
+  if (!result.success) {
+    return formatActionError(result.error);
+  }
 
   try {
     const member = await prisma.teamMember.create({ data: result.data });
@@ -36,7 +39,9 @@ export async function deleteMember(id: string) {
 
 export async function createTeam(data: TeamInput) {
   const result = teamSchema.safeParse(data);
-  if (!result.success) return { error: result.error.flatten().fieldErrors };
+  if (!result.success) {
+    return formatActionError(result.error);
+  }
 
   try {
     const team = await prisma.team.create({
@@ -55,7 +60,9 @@ export async function createTeam(data: TeamInput) {
 
 export async function updateTeam(id: string, data: TeamInput) {
   const result = teamSchema.safeParse(data);
-  if (!result.success) return { error: result.error.flatten().fieldErrors };
+  if (!result.success) {
+    return formatActionError(result.error);
+  }
 
   try {
     const team = await prisma.team.update({

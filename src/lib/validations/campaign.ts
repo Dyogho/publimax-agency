@@ -8,7 +8,7 @@ export const campaignSchema = z.object({
   startDate: z.coerce.date(),
   endDate: z.coerce.date(),
   estimatedRoi: z.coerce.number().optional().or(z.literal(0)),
-  status: z.nativeEnum(CampaignStatus).default(CampaignStatus.PLANNING),
+  status: z.enum(CampaignStatus).default(CampaignStatus.PLANNING),
   clientId: z.string().min(1, "Client is required"),
 }).refine((data) => data.endDate >= data.startDate, {
   message: "End date must be after start date",

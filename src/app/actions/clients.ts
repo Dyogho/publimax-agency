@@ -3,12 +3,13 @@
 import prisma from "@/lib/prisma";
 import { clientSchema, type ClientInput } from "@/lib/validations/client";
 import { revalidatePath } from "next/cache";
+import { formatActionError } from "@/lib/utils/errors";
 
 export async function createClient(data: ClientInput) {
   const result = clientSchema.safeParse(data);
 
   if (!result.success) {
-    return { error: result.error.flatten().fieldErrors };
+    return formatActionError(result.error);
   }
 
   try {
@@ -28,7 +29,7 @@ export async function updateClient(id: string, data: ClientInput) {
   const result = clientSchema.safeParse(data);
 
   if (!result.success) {
-    return { error: result.error.flatten().fieldErrors };
+    return formatActionError(result.error);
   }
 
   try {

@@ -3,12 +3,13 @@
 import prisma from "@/lib/prisma";
 import { campaignSchema, type CampaignInput } from "@/lib/validations/campaign";
 import { revalidatePath } from "next/cache";
+import { formatActionError } from "@/lib/utils/errors";
 
 export async function createCampaign(data: CampaignInput & { teamIds?: string[] }) {
   const result = campaignSchema.safeParse(data);
 
   if (!result.success) {
-    return { error: result.error.flatten().fieldErrors };
+    return formatActionError(result.error);
   }
 
   const { teamIds, ...campaignData } = data;
@@ -35,7 +36,7 @@ export async function updateCampaign(id: string, data: CampaignInput & { teamIds
   const result = campaignSchema.safeParse(data);
 
   if (!result.success) {
-    return { error: result.error.flatten().fieldErrors };
+    return formatActionError(result.error);
   }
 
   const { teamIds, ...campaignData } = data;

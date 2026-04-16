@@ -28,6 +28,19 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
           >
             Clients
           </Link>
+          <div className="pt-4 pb-2 px-4 text-[10px] font-bold uppercase tracking-widest text-zinc-400">Human Talent</div>
+          <Link 
+            href="/team" 
+            className="block px-4 py-2 text-sm font-medium text-zinc-500 hover:text-zinc-950 dark:text-zinc-400 dark:hover:text-zinc-50 transition-colors"
+          >
+            Directory
+          </Link>
+          <Link 
+            href="/teams" 
+            className="block px-4 py-2 text-sm font-medium text-zinc-500 hover:text-zinc-950 dark:text-zinc-400 dark:hover:text-zinc-50 transition-colors"
+          >
+            Work Units (Teams)
+          </Link>
         </nav>
       </aside>
 

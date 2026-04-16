@@ -4,16 +4,23 @@ import prisma from "@/lib/prisma";
 import { campaignSchema, type CampaignInput } from "@/lib/validations/campaign";
 import { revalidatePath } from "next/cache";
 
-export async function createCampaign(data: CampaignInput) {
+export async function createCampaign(data: CampaignInput & { teamIds?: string[] }) {
   const result = campaignSchema.safeParse(data);
 
   if (!result.success) {
     return { error: result.error.flatten().fieldErrors };
   }
 
+  const { teamIds, ...campaignData } = data;
+
   try {
     const campaign = await prisma.campaign.create({
-      data: result.data,
+      data: {
+        ...result.data,
+        teams: teamIds ? {
+          connect: teamIds.map(id => ({ id }))
+        } : undefined
+      },
     });
     revalidatePath("/dashboard");
     revalidatePath("/campaigns");
@@ -24,17 +31,24 @@ export async function createCampaign(data: CampaignInput) {
   }
 }
 
-export async function updateCampaign(id: string, data: CampaignInput) {
+export async function updateCampaign(id: string, data: CampaignInput & { teamIds?: string[] }) {
   const result = campaignSchema.safeParse(data);
 
   if (!result.success) {
     return { error: result.error.flatten().fieldErrors };
   }
 
+  const { teamIds, ...campaignData } = data;
+
   try {
     const campaign = await prisma.campaign.update({
       where: { id },
-      data: result.data,
+      data: {
+        ...result.data,
+        teams: teamIds ? {
+          set: teamIds.map(id => ({ id }))
+        } : undefined
+      },
     });
     revalidatePath("/dashboard");
     revalidatePath("/campaigns");

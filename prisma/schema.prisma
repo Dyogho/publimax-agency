@@ -56,7 +56,7 @@ model Campaign {
   clientId     String
   client       Client         @relation(fields: [clientId], references: [id])
   deliverables Deliverable[]
-  teamMembers  TeamMember[]
+  teams        Team[]         @relation("TeamCampaigns")
   invoices     Invoice[]
   moodboards   Moodboard[]
   createdAt    DateTime       @default(now())
@@ -75,12 +75,23 @@ model Deliverable {
 }
 
 model TeamMember {
-  id        String     @id @default(cuid())
+  id        String   @id @default(cuid())
   name      String
   role      String
-  campaigns Campaign[]
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
+  teams     Team[]   @relation("TeamMembership")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Team {
+  id          String       @id @default(cuid())
+  name        String
+  description String?
+  metadata    Json?
+  members     TeamMember[] @relation("TeamMembership")
+  campaigns   Campaign[]   @relation("TeamCampaigns")
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
 }
 
 model Invoice {

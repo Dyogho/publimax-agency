@@ -5,8 +5,9 @@ import { deliverableSchema, deliverableStatusSchema, deliverableSubmissionSchema
 import { revalidatePath } from "next/cache";
 import { formatActionError } from "@/lib/utils/errors";
 import { DeliverableStatus } from "@prisma/client";
+import { type ActionResult } from "@/lib/types/action";
 
-export async function createDeliverable(data: DeliverableInput) {
+export async function createDeliverable(data: DeliverableInput): Promise<ActionResult> {
   const result = deliverableSchema.safeParse(data);
 
   if (!result.success) {
@@ -34,7 +35,7 @@ export async function createDeliverable(data: DeliverableInput) {
   }
 }
 
-export async function updateDeliverableStatus(id: string, status: DeliverableStatus) {
+export async function updateDeliverableStatus(id: string, status: DeliverableStatus): Promise<ActionResult> {
   const result = deliverableStatusSchema.safeParse({ status });
 
   if (!result.success) {
@@ -56,11 +57,11 @@ export async function updateDeliverableStatus(id: string, status: DeliverableSta
   }
 }
 
-export async function submitDeliverable(id: string, deliveryUrl: string) {
+export async function submitDeliverable(id: string, deliveryUrl: string): Promise<ActionResult> {
   const result = deliverableSubmissionSchema.safeParse({ deliveryUrl });
 
   if (!result.success) {
-    return { error: result.error.errors[0].message };
+    return formatActionError(result.error);
   }
 
   try {
@@ -81,7 +82,7 @@ export async function submitDeliverable(id: string, deliveryUrl: string) {
   }
 }
 
-export async function deleteDeliverable(id: string) {
+export async function deleteDeliverable(id: string): Promise<ActionResult> {
   try {
     await prisma.deliverable.delete({
       where: { id },

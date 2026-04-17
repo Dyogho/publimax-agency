@@ -2,16 +2,17 @@
 
 import { useState } from "react";
 import { TaskModal } from "./task-modal";
+import type { CalendarDay, CalendarTask } from "@/lib/types/calendar";
 
 interface CalendarGridClientProps {
-  days: any[];
+  days: CalendarDay[];
   now: { day: number; month: number; year: number };
   monthName: string;
   year: number;
 }
 
 export function CalendarGridClient({ days, now, monthName, year }: CalendarGridClientProps) {
-  const [selectedTask, setSelectedTask] = useState<any | null>(null);
+  const [selectedTask, setSelectedTask] = useState<CalendarTask | null>(null);
 
   return (
     <div className="flex flex-col h-full bg-white dark:bg-black rounded-2xl border border-zinc-200 dark:border-zinc-800 overflow-hidden shadow-sm">
@@ -59,7 +60,7 @@ export function CalendarGridClient({ days, now, monthName, year }: CalendarGridC
                       {item.day}
                     </span>
                     <div className="mt-2 space-y-1.5">
-                      {item.tasks.map((task: any) => (
+                      {item.tasks.map((task) => (
                         <button
                           key={task.id}
                           onClick={() => setSelectedTask(task)}

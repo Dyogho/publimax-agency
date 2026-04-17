@@ -7,7 +7,7 @@ Requerimientos:
 - [x] Calendario entregables (banners, videos, copys)
 - [ ] Facturación por hitos/mensual
 - [x] Equipo creativo asignado por campaña
-- [ ] Reporte ROI estimado (% alcance)
+- [x] Reporte ROI estimado (% alcance)
 - [ ] Moodboards compartibles
 
 Responsive Design Multi-dispositivo:

@@ -4,7 +4,7 @@ import prisma from "@/lib/prisma";
 import { invoiceSchema, type InvoiceInput } from "@/lib/validations/billing";
 import { revalidatePath } from "next/cache";
 import { formatActionError } from "@/lib/utils/errors";
-import { BillingType } from "@prisma/client";
+import { BillingType, InvoiceStatus } from "@prisma/client";
 
 export async function createInvoice(data: InvoiceInput) {
   // 1. Fetch campaign dates if not provided to enforce duration rule server-side
@@ -33,7 +33,7 @@ export async function createInvoice(data: InvoiceInput) {
   // 2. Persist
   try {
     const { campaignStartDate, campaignEndDate, ...cleanData } = result.data;
-    
+
     const invoice = await prisma.invoice.create({
       data: {
         ...cleanData,
@@ -50,7 +50,7 @@ export async function createInvoice(data: InvoiceInput) {
   }
 }
 
-export async function updateInvoiceStatus(id: string, status: any) {
+export async function updateInvoiceStatus(id: string, status: InvoiceStatus) {
   try {
     await prisma.invoice.update({
       where: { id },
@@ -86,7 +86,7 @@ export async function getBillingSummary() {
     const paid = invoices
       .filter(i => i.status === "PAID")
       .reduce((sum, i) => sum + i.amount, 0);
-    
+
     const pending = invoices
       .filter(i => i.status === "PENDING")
       .reduce((sum, i) => sum + i.amount, 0);

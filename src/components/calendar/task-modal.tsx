@@ -1,7 +1,9 @@
 "use client";
 
+import type { CalendarTask } from "@/lib/types/calendar";
+
 interface TaskModalProps {
-  task: any; // Using any for now to simplify the complex joined type
+  task: CalendarTask | null;
   onClose: () => void;
 }
 
@@ -46,7 +48,7 @@ export function TaskModal({ task, onClose }: TaskModalProps) {
             <div className="space-y-1">
               <p className="text-xs font-bold text-zinc-400 uppercase">Equipos Asignados</p>
               <div className="flex flex-wrap gap-2">
-                {task.teams?.map((team: any) => (
+                {task.teams?.map((team) => (
                   <span key={team.id} className="text-xs font-medium text-zinc-600 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 rounded border border-zinc-200 dark:border-zinc-700">
                     {team.name}
                   </span>

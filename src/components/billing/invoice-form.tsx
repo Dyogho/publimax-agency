@@ -2,7 +2,8 @@
 
 import { useActionState, useMemo } from "react";
 import { createInvoice } from "@/app/actions/billing";
-import { BillingType, Campaign, Deliverable } from "@prisma/client";
+import { BillingType, Campaign, Deliverable, InvoiceStatus } from "@prisma/client";
+import { InvoiceInput } from "@/lib/validations/billing";
 
 interface InvoiceFormProps {
   campaign: Campaign & { deliverables: Deliverable[] };
@@ -19,25 +20,26 @@ export function InvoiceForm({ campaign, onSuccess }: InvoiceFormProps) {
     return diffDays < 30;
   }, [campaign.startDate, campaign.endDate]);
 
-  async function handleSubmit(prevState: any, formData: FormData) {
-    const data = {
+  async function handleSubmit(prevState: { error?: string } | null, formData: FormData) {
+    const data: InvoiceInput = {
       amount: Number(formData.get("amount")),
       dueDate: new Date(formData.get("dueDate") as string),
       description: formData.get("description") as string,
       type: formData.get("type") as BillingType,
+      status: InvoiceStatus.PENDING,
       campaignId: campaign.id,
       deliverableId: formData.get("deliverableId") as string || null,
       campaignStartDate: campaign.startDate,
       campaignEndDate: campaign.endDate,
     };
 
-    const result = await createInvoice(data as any);
+    const result = await createInvoice(data);
 
     if ("success" in result && result.success) {
       onSuccess?.();
       return { success: true };
     }
-    return { error: "error" in result ? result.error : "Error desconocido" };
+    return { error: "error" in result ? (result.error as string) : "Error desconocido" };
   }
 
   const [state, formAction, isPending] = useActionState(handleSubmit, null);

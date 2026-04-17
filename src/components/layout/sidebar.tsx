@@ -59,6 +59,12 @@ export function Sidebar({ role }: SidebarProps) {
             >
               Billing
             </Link>
+            <Link 
+              href="/admin/reports" 
+              className="block px-4 py-2 text-sm font-medium text-zinc-500 hover:text-zinc-950 dark:text-zinc-400 dark:hover:text-zinc-50 transition-colors"
+            >
+              Reports
+            </Link>
           </>
         )}
 

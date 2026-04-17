@@ -29,6 +29,9 @@ export function CampaignForm({ clients, campaign, onSuccess }: CampaignFormProps
       clientId: formData.get("clientId") as string,
       status: (formData.get("status") as CampaignStatus) || CampaignStatus.PLANNING,
       color: formData.get("color") as string,
+      estimatedRoi: Number(formData.get("estimatedRoi") || 0),
+      targetAudience: Number(formData.get("targetAudience") || 0),
+      expectedReach: Number(formData.get("expectedReach") || 0),
     };
 
     const result = isEditing 
@@ -88,6 +91,21 @@ export function CampaignForm({ clients, campaign, onSuccess }: CampaignFormProps
           <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1.5">Budget ($)</label>
           <input name="budget" type="number" defaultValue={campaign?.budget} required className="w-full px-4 py-2.5 bg-zinc-50 dark:bg-black border border-zinc-200 dark:border-zinc-800 rounded-xl outline-none text-sm shadow-sm focus:ring-2 focus:ring-black dark:focus:ring-white transition-all" placeholder="0.00" />
           {errors?.budget && <p className="mt-1 text-xs text-red-500">{errors.budget[0]}</p>}
+        </div>
+      </div>
+
+      <div className="grid grid-cols-3 gap-4">
+        <div>
+          <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1.5">ROI Proj. (x)</label>
+          <input name="estimatedRoi" type="number" step="0.1" defaultValue={campaign?.estimatedRoi || 0} className="w-full px-4 py-2.5 bg-zinc-50 dark:bg-black border border-zinc-200 dark:border-zinc-800 rounded-xl outline-none text-sm shadow-sm focus:ring-2 focus:ring-black transition-all" placeholder="3.5" />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1.5">Audiencia</label>
+          <input name="targetAudience" type="number" defaultValue={campaign?.targetAudience || 0} className="w-full px-4 py-2.5 bg-zinc-50 dark:bg-black border border-zinc-200 dark:border-zinc-800 rounded-xl outline-none text-sm shadow-sm focus:ring-2 focus:ring-black transition-all" placeholder="500000" />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1.5">Alcance Exp.</label>
+          <input name="expectedReach" type="number" defaultValue={campaign?.expectedReach || 0} className="w-full px-4 py-2.5 bg-zinc-50 dark:bg-black border border-zinc-200 dark:border-zinc-800 rounded-xl outline-none text-sm shadow-sm focus:ring-2 focus:ring-black transition-all" placeholder="50000" />
         </div>
       </div>
 

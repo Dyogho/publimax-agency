@@ -60,6 +60,8 @@ model Campaign {
   estimatedRoi Float?
   status       CampaignStatus @default(PLANNING)
   color        String?        @default("#3b82f6")
+  targetAudience Int?
+  expectedReach  Int?
   clientId     String
   client       Client         @relation(fields: [clientId], references: [id])
   deliverables Deliverable[]

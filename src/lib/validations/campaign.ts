@@ -10,6 +10,8 @@ export const campaignSchema = z.object({
   estimatedRoi: z.coerce.number().optional().or(z.literal(0)),
   status: z.enum(CampaignStatus).default(CampaignStatus.PLANNING),
   color: z.string().optional().default("#3b82f6"),
+  targetAudience: z.coerce.number().int().min(0).optional().or(z.literal(0)),
+  expectedReach: z.coerce.number().int().min(0).optional().or(z.literal(0)),
   clientId: z.string().min(1, "Client is required"),
 }).refine((data) => data.endDate >= data.startDate, {
   message: "End date must be after start date",

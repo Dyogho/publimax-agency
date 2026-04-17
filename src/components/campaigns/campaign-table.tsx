@@ -1,6 +1,6 @@
 "use client";
 
-import { type Campaign, type Client, type Deliverable, type Invoice, type Moodboard } from "@prisma/client";
+import { type Campaign, type Client, type Deliverable, type Invoice, type Moodboard, type Team } from "@prisma/client";
 import { deleteCampaign } from "@/app/actions/campaigns";
 import { useState } from "react";
 import { BillingManager } from "../billing/billing-manager";
@@ -8,25 +8,33 @@ import { ReachGauge } from "../reports/reach-gauge";
 import { ReferenceGrid } from "../moodboards/reference-grid";
 import { AddReferenceForm } from "../moodboards/add-reference-form";
 import { AdminMoodboardControls } from "../moodboards/admin-moodboard-controls";
+import { TeamCampaignManager } from "./team-campaign-manager";
+import { DeliverableManager } from "./deliverable-manager";
+
+type DeliverableWithTeams = Deliverable & { teams: Team[] };
 
 type CampaignWithExtras = Campaign & { 
   client: Client;
-  deliverables: Deliverable[];
+  deliverables: DeliverableWithTeams[];
   invoices: Invoice[];
   moodboards: Moodboard[];
+  teams: Team[];
 };
 
 interface CampaignTableProps {
   campaigns: CampaignWithExtras[];
+  allTeams: Team[];
 }
 
-export function CampaignTable({ campaigns }: CampaignTableProps) {
+export function CampaignTable({ campaigns, allTeams }: CampaignTableProps) {
   const [isDeleting, setIsDeleting] = useState<string | null>(null);
   const [activeBillingCampaign, setActiveBillingCampaign] = useState<CampaignWithExtras | null>(null);
   const [activeMoodboardCampaign, setActiveMoodboardCampaign] = useState<CampaignWithExtras | null>(null);
+  const [activeTeamsCampaign, setActiveTeamsCampaign] = useState<CampaignWithExtras | null>(null);
+  const [activeDeliverablesCampaign, setActiveDeliverablesCampaign] = useState<CampaignWithExtras | null>(null);
 
   async function handleDelete(id: string) {
-    if (!confirm("Are you sure you want to delete this campaign?")) return;
+    if (!confirm("¿Estás seguro de que deseas eliminar esta campaña?")) return;
     setIsDeleting(id);
     const result = await deleteCampaign(id);
     if (result.error) alert(result.error);
@@ -40,25 +48,32 @@ export function CampaignTable({ campaigns }: CampaignTableProps) {
     COMPLETED: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400",
   };
 
+  const statusTranslations = {
+    PLANNING: "Planificación",
+    ACTIVE: "Activa",
+    PAUSED: "Pausada",
+    COMPLETED: "Completada",
+  };
+
   return (
     <div className="overflow-x-auto rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 shadow-sm">
       <table className="w-full text-left border-collapse">
         <thead className="bg-zinc-50 dark:bg-zinc-900 border-b border-zinc-200 dark:border-zinc-800 text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
           <tr>
-            <th className="px-6 py-4">Campaign</th>
-            <th className="px-6 py-4">Reach %</th>
-            <th className="px-6 py-4">Client</th>
-            <th className="px-6 py-4">Budget</th>
-            <th className="px-6 py-4">Dates</th>
-            <th className="px-6 py-4">Status</th>
-            <th className="px-6 py-4 text-right">Actions</th>
+            <th className="px-6 py-4">Campaña</th>
+            <th className="px-6 py-4">% Alcance</th>
+            <th className="px-6 py-4">Cliente</th>
+            <th className="px-6 py-4">Presupuesto</th>
+            <th className="px-6 py-4">Fechas</th>
+            <th className="px-6 py-4">Estado</th>
+            <th className="px-6 py-4 text-right">Acciones</th>
           </tr>
         </thead>
         <tbody className="divide-y divide-zinc-200 dark:divide-zinc-800">
           {campaigns.length === 0 ? (
             <tr>
               <td colSpan={7} className="px-6 py-12 text-center text-zinc-500 dark:text-zinc-400 text-sm">
-                No campaigns found.
+                No se encontraron campañas.
               </td>
             </tr>
           ) : (
@@ -87,7 +102,7 @@ export function CampaignTable({ campaigns }: CampaignTableProps) {
                   </td>
                   <td className="px-6 py-4 text-sm">
                     <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wide ${statusColors[campaign.status]}`}>
-                      {campaign.status}
+                      {statusTranslations[campaign.status]}
                     </span>
                   </td>
                   <td className="px-6 py-4 text-right">
@@ -96,7 +111,19 @@ export function CampaignTable({ campaigns }: CampaignTableProps) {
                         className="text-blue-600 hover:text-blue-700 text-xs font-bold"
                         onClick={() => setActiveBillingCampaign(campaign)}
                       >
-                        Billing
+                        Cobros
+                      </button>
+                      <button 
+                        className="text-blue-600 hover:text-blue-700 text-xs font-bold"
+                        onClick={() => setActiveDeliverablesCampaign(campaign)}
+                      >
+                        Tareas
+                      </button>
+                      <button 
+                        className="text-zinc-600 hover:text-black dark:text-zinc-400 dark:hover:text-white text-xs font-bold"
+                        onClick={() => setActiveTeamsCampaign(campaign)}
+                      >
+                        Equipos
                       </button>
                       <button 
                         className="text-zinc-600 hover:text-black dark:text-zinc-400 dark:hover:text-white text-xs font-bold"
@@ -109,7 +136,7 @@ export function CampaignTable({ campaigns }: CampaignTableProps) {
                         className="text-red-500 hover:text-red-600 text-xs font-medium disabled:opacity-50"
                         onClick={() => handleDelete(campaign.id)}
                       >
-                        {isDeleting === campaign.id ? "..." : "Delete"}
+                        {isDeleting === campaign.id ? "..." : "Eliminar"}
                       </button>
                     </div>
                   </td>
@@ -208,6 +235,72 @@ export function CampaignTable({ campaigns }: CampaignTableProps) {
                 className="px-8 py-2.5 bg-black dark:bg-white text-white dark:text-black rounded-2xl text-sm font-bold shadow-lg hover:opacity-90 transition-all"
               >
                 Finalizar Gestión
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Teams Management Modal */}
+      {activeTeamsCampaign && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-3xl w-full max-w-lg overflow-hidden shadow-2xl animate-in zoom-in-95 duration-200">
+            <div className="p-6 border-b border-zinc-100 dark:border-zinc-900 flex justify-between items-center">
+              <div>
+                <h2 className="text-xl font-bold">Equipos Asignados</h2>
+                <p className="text-xs text-zinc-500">{activeTeamsCampaign.name}</p>
+              </div>
+              <button 
+                onClick={() => setActiveTeamsCampaign(null)}
+                className="p-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-full transition-colors"
+              >
+                ✕
+              </button>
+            </div>
+            <div className="p-6 max-h-[60vh] overflow-y-auto">
+              <TeamCampaignManager 
+                campaignId={activeTeamsCampaign.id}
+                allTeams={allTeams}
+                initialSelectedTeamIds={activeTeamsCampaign.teams.map(t => t.id)}
+              />
+            </div>
+            <div className="p-6 border-t border-zinc-100 dark:border-zinc-900 bg-zinc-50/50 dark:bg-zinc-900/50 flex justify-end">
+              <button 
+                onClick={() => setActiveTeamsCampaign(null)}
+                className="px-6 py-2 text-sm font-bold text-zinc-500 hover:text-black transition-colors"
+              >
+                Cerrar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Deliverables Management Modal */}
+      {activeDeliverablesCampaign && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-3xl w-full max-w-2xl overflow-hidden shadow-2xl animate-in zoom-in-95 duration-200">
+            <div className="p-6 border-b border-zinc-100 dark:border-zinc-900 flex justify-between items-center">
+              <div>
+                <h2 className="text-xl font-bold">Entregables y Tareas</h2>
+                <p className="text-xs text-zinc-500">{activeDeliverablesCampaign.name}</p>
+              </div>
+              <button 
+                onClick={() => setActiveDeliverablesCampaign(null)}
+                className="p-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-full transition-colors"
+              >
+                ✕
+              </button>
+            </div>
+            <div className="p-6 max-h-[60vh] overflow-y-auto">
+              <DeliverableManager campaign={activeDeliverablesCampaign} />
+            </div>
+            <div className="p-6 border-t border-zinc-100 dark:border-zinc-900 bg-zinc-50/50 dark:bg-zinc-900/50 flex justify-end">
+              <button 
+                onClick={() => setActiveDeliverablesCampaign(null)}
+                className="px-6 py-2 text-sm font-bold text-zinc-500 hover:text-black transition-colors"
+              >
+                Cerrar
               </button>
             </div>
           </div>

@@ -78,3 +78,21 @@ export async function deleteCampaign(id: string) {
     return { error: "Failed to delete campaign." };
   }
 }
+
+export async function assignTeamsToCampaign(campaignId: string, teamIds: string[]) {
+  try {
+    await prisma.campaign.update({
+      where: { id: campaignId },
+      data: {
+        teams: {
+          set: teamIds.map(id => ({ id }))
+        }
+      }
+    });
+    revalidatePath("/admin/campaigns");
+    return { success: true };
+  } catch (e) {
+    console.error("Error assigning teams to campaign:", e);
+    return { error: "Failed to assign teams." };
+  }
+}

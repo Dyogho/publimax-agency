@@ -17,11 +17,12 @@ export async function createMember(data: MemberInput) {
   const { name, email, password, role, systemRole } = result.data;
 
   try {
-    // 1. Create user in Supabase Auth via Admin API
     const supabaseAdmin = await createAdminClient();
+    
+    // 1. Create user in Supabase Auth
     const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
       email,
-      password,
+      password: password || undefined,
       email_confirm: true,
       user_metadata: { name, role: systemRole },
     });
@@ -31,24 +32,34 @@ export async function createMember(data: MemberInput) {
       return { error: authError.message };
     }
 
-    // 2. Create profile in Prisma
+    // 2. Persist in Database
     try {
-      const member = await prisma.teamMember.create({
-        data: {
-          name,
-          email,
-          password,
-          role,
-          systemRole,
-        },
-      });
-
-      revalidatePath("/admin/team");
-      revalidatePath("/admin/teams");
-      return { success: true, data: member };
+      if (systemRole === "ADMIN") {
+        const admin = await prisma.admin.create({
+          data: {
+            name,
+            email,
+            supabaseId: authData.user.id,
+          },
+        });
+        revalidatePath("/admin");
+        return { success: true, data: admin };
+      } else {
+        const member = await prisma.teamMember.create({
+          data: {
+            name,
+            email,
+            role: role || null,
+            systemRole,
+            supabaseId: authData.user.id,
+          },
+        });
+        revalidatePath("/admin/team");
+        revalidatePath("/admin/teams");
+        return { success: true, data: member };
+      }
     } catch (dbError) {
       console.error("Database Error:", dbError);
-      // Cleanup: Delete auth user if DB creation fails
       await supabaseAdmin.auth.admin.deleteUser(authData.user.id);
       return { error: "Failed to create profile in database." };
     }

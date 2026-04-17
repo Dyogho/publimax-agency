@@ -78,10 +78,9 @@ export function MemberForm({ onSuccess }: MemberFormProps) {
         <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1">Specialized Role</label>
         <select
           name="role"
-          required
           className="w-full px-4 py-2 bg-zinc-50 dark:bg-black border border-zinc-200 dark:border-zinc-800 rounded-lg outline-none focus:ring-2 focus:ring-black dark:focus:ring-white transition-all text-sm"
         >
-          <option value="">Select job role</option>
+          <option value="">Select job role (Optional for Admin)</option>
           <option value="Designer">Designer</option>
           <option value="Video Editor">Video Editor</option>
           <option value="Copywriter">Copywriter</option>

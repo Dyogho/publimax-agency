@@ -11,12 +11,33 @@ export async function SidebarWrapper() {
     redirect("/login");
   }
 
+  // 1. Check Admin
+  const admin = await prisma.admin.findUnique({
+    where: { supabaseId: user.id },
+    select: { id: true }
+  });
+
+  if (admin) {
+    return <Sidebar role="ADMIN" />;
+  }
+
+  // 2. Check TeamMember
   const member = await prisma.teamMember.findUnique({
-    where: { email: user.email },
+    where: { supabaseId: user.id },
     select: { systemRole: true }
   });
 
   if (!member) {
+    // Fallback to email for transition period or legacy sync
+    const memberByEmail = await prisma.teamMember.findUnique({
+      where: { email: user.email },
+      select: { systemRole: true, id: true }
+    });
+
+    if (memberByEmail) {
+      return <Sidebar role={memberByEmail.systemRole} />;
+    }
+    
     redirect("/login");
   }
 

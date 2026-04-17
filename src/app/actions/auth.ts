@@ -32,18 +32,47 @@ export async function login(prevState: { error?: string } | null | undefined, fo
     return { error: "Error al obtener perfil de usuario" };
   }
 
-  let redirectPath = "/admin";
+  let redirectPath = "/login";
   try {
-    const member = await prisma.teamMember.findUnique({
-      where: { email: user.email },
-      select: { systemRole: true }
+    // 1. Check Admin table first
+    const admin = await prisma.admin.findUnique({
+      where: { supabaseId: user.id },
+      select: { id: true }
     });
 
-    if (member && member.systemRole === "CREATIVE") {
-      redirectPath = "/creative";
+    if (admin) {
+      redirectPath = "/admin";
+    } else {
+      // 2. Check TeamMember table
+      const member = await prisma.teamMember.findUnique({
+        where: { supabaseId: user.id },
+        select: { systemRole: true }
+      });
+
+      if (member) {
+        redirectPath = member.systemRole === "CREATIVE" ? "/creative" : "/admin";
+      } else {
+        // Fallback for email-based legacy or specific cases if needed
+        const memberByEmail = await prisma.teamMember.findUnique({
+          where: { email: user.email },
+          select: { systemRole: true, id: true }
+        });
+
+        if (memberByEmail) {
+          // Sync supabaseId if missing
+          await prisma.teamMember.update({
+            where: { id: memberByEmail.id },
+            data: { supabaseId: user.id }
+          });
+          redirectPath = memberByEmail.systemRole === "CREATIVE" ? "/creative" : "/admin";
+        } else {
+          return { error: "No tienes un perfil asignado en el sistema." };
+        }
+      }
     }
   } catch (error) {
     console.error("Redirection Error:", error);
+    return { error: "Error al verificar permisos" };
   }
 
   revalidatePath("/", "layout");

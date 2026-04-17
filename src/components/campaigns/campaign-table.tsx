@@ -1,17 +1,23 @@
 "use client";
 
-import { type Campaign, type Client } from "@prisma/client";
+import { type Campaign, type Client, type Deliverable, type Invoice } from "@prisma/client";
 import { deleteCampaign } from "@/app/actions/campaigns";
 import { useState } from "react";
+import { BillingManager } from "../billing/billing-manager";
 
-type CampaignWithClient = Campaign & { client: Client };
+type CampaignWithExtras = Campaign & { 
+  client: Client;
+  deliverables: Deliverable[];
+  invoices: Invoice[];
+};
 
 interface CampaignTableProps {
-  campaigns: CampaignWithClient[];
+  campaigns: CampaignWithExtras[];
 }
 
 export function CampaignTable({ campaigns }: CampaignTableProps) {
   const [isDeleting, setIsDeleting] = useState<string | null>(null);
+  const [activeBillingCampaign, setActiveBillingCampaign] = useState<CampaignWithExtras | null>(null);
 
   async function handleDelete(id: string) {
     if (!confirm("Are you sure you want to delete this campaign?")) return;
@@ -70,6 +76,12 @@ export function CampaignTable({ campaigns }: CampaignTableProps) {
                 <td className="px-6 py-4 text-right">
                   <div className="flex justify-end gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
                     <button 
+                      className="text-blue-600 hover:text-blue-700 text-xs font-bold"
+                      onClick={() => setActiveBillingCampaign(campaign)}
+                    >
+                      Billing
+                    </button>
+                    <button 
                       disabled={isDeleting === campaign.id}
                       className="text-red-500 hover:text-red-600 text-xs font-medium disabled:opacity-50"
                       onClick={() => handleDelete(campaign.id)}
@@ -83,6 +95,37 @@ export function CampaignTable({ campaigns }: CampaignTableProps) {
           )}
         </tbody>
       </table>
+
+      {/* Billing Modal */}
+      {activeBillingCampaign && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-3xl w-full max-w-xl overflow-hidden shadow-2xl animate-in zoom-in-95 duration-200">
+            <div className="p-6 border-b border-zinc-100 dark:border-zinc-900 flex justify-between items-center">
+              <div>
+                <h2 className="text-xl font-bold">Gestión de Cobros</h2>
+                <p className="text-xs text-zinc-500">{activeBillingCampaign.name}</p>
+              </div>
+              <button 
+                onClick={() => setActiveBillingCampaign(null)}
+                className="p-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-full transition-colors"
+              >
+                ✕
+              </button>
+            </div>
+            <div className="p-6 max-h-[60vh] overflow-y-auto">
+              <BillingManager campaign={activeBillingCampaign} />
+            </div>
+            <div className="p-6 border-t border-zinc-100 dark:border-zinc-900 bg-zinc-50/50 dark:bg-zinc-900/50 flex justify-end">
+              <button 
+                onClick={() => setActiveBillingCampaign(null)}
+                className="px-6 py-2 text-sm font-bold text-zinc-500 hover:text-black transition-colors"
+              >
+                Cerrar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

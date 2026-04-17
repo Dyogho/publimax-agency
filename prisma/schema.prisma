@@ -33,6 +33,12 @@ enum InvoiceStatus {
   CANCELLED
 }
 
+enum BillingType {
+  MILESTONE
+  MONTHLY
+}
+
+
 model Client {
   id        String     @id @default(cuid())
   name      String
@@ -75,6 +81,7 @@ model Deliverable {
   campaignId String
   campaign   Campaign          @relation(fields: [campaignId], references: [id])
   teams      Team[]            @relation("TeamDeliverables")
+  invoices   Invoice[]
   createdAt  DateTime          @default(now())
   updatedAt  DateTime          @updatedAt
 }
@@ -108,14 +115,18 @@ model Team {
 }
 
 model Invoice {
-  id         String        @id @default(cuid())
-  amount     Float
-  dueDate    DateTime
-  status     InvoiceStatus @default(PENDING)
-  campaignId String
-  campaign   Campaign      @relation(fields: [campaignId], references: [id])
-  createdAt  DateTime      @default(now())
-  updatedAt  DateTime      @updatedAt
+  id            String        @id @default(cuid())
+  amount        Float
+  dueDate       DateTime
+  description   String?
+  type          BillingType   @default(MILESTONE)
+  status        InvoiceStatus @default(PENDING)
+  campaignId    String
+  campaign      Campaign      @relation(fields: [campaignId], references: [id])
+  deliverableId String?
+  deliverable   Deliverable?  @relation(fields: [deliverableId], references: [id])
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
 }
 
 model Moodboard {

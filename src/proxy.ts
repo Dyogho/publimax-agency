@@ -1,10 +1,8 @@
 import { NextResponse, type NextRequest } from 'next/server'
-// import { updateSession } from '@/lib/supabase/middleware'
+import { updateSession } from '@/lib/supabase/middleware'
 
 export default async function proxy(request: NextRequest) {
-  // Comentado temporalmente para pruebas sin login
-  // return await updateSession(request)
-  return NextResponse.next()
+  return await updateSession(request)
 }
 
 export const config = {

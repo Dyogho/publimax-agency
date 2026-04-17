@@ -19,10 +19,13 @@ export function ClientForm({ client, onSuccess }: ClientFormProps) {
   const isEditing = !!client;
 
   async function handleSubmit(prevState: FormState, formData: FormData): Promise<FormState> {
+    const countryCode = formData.get("countryCode") as string;
+    const phoneNumber = formData.get("phoneNumber") as string;
+    
     const data: ClientInput = {
       name: formData.get("name") as string,
       email: formData.get("email") as string,
-      phone: formData.get("phone") as string,
+      phone: phoneNumber ? `${countryCode}${phoneNumber}` : "",
       address: formData.get("address") as string,
     };
 
@@ -44,6 +47,10 @@ export function ClientForm({ client, onSuccess }: ClientFormProps) {
   const errors = typeof state?.error === "object" ? state.error : null;
   const generalError = typeof state?.error === "string" ? state.error : null;
 
+  // Split existing phone for editing
+  const initialCountryCode = client?.phone?.startsWith('+') ? client.phone.slice(0, 3) : "+51";
+  const initialPhoneNumber = client?.phone?.startsWith('+') ? client.phone.slice(3) : (client?.phone || "");
+
   return (
     <form action={formAction} className="space-y-5">
       {generalError && (
@@ -53,47 +60,62 @@ export function ClientForm({ client, onSuccess }: ClientFormProps) {
       )}
 
       <div>
-        <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1.5">Name</label>
+        <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1.5">Nombre de la Empresa</label>
         <input
           name="name"
           defaultValue={client?.name}
           required
           className="w-full px-4 py-2.5 bg-zinc-50 dark:bg-black border border-zinc-200 dark:border-zinc-800 rounded-xl focus:ring-2 focus:ring-black dark:focus:ring-white transition-all outline-none text-sm"
-          placeholder="Client or Company Name"
+          placeholder="Nombre del Cliente o Empresa"
         />
         {errors?.name && <p className="mt-1 text-xs text-red-500">{errors.name[0]}</p>}
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1.5">Email</label>
+        <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1.5">Correo Electrónico</label>
         <input
           name="email"
           type="email"
           defaultValue={client?.email}
           required
           className="w-full px-4 py-2.5 bg-zinc-50 dark:bg-black border border-zinc-200 dark:border-zinc-800 rounded-xl focus:ring-2 focus:ring-black dark:focus:ring-white transition-all outline-none text-sm"
-          placeholder="contact@email.com"
+          placeholder="contacto@empresa.com"
         />
         {errors?.email && <p className="mt-1 text-xs text-red-500">{errors.email[0]}</p>}
       </div>
 
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1.5">Phone</label>
-          <input
-            name="phone"
-            defaultValue={client?.phone || ""}
-            className="w-full px-4 py-2.5 bg-zinc-50 dark:bg-black border border-zinc-200 dark:border-zinc-800 rounded-xl focus:ring-2 focus:ring-black dark:focus:ring-white transition-all outline-none text-sm"
-            placeholder="+1 ..."
-          />
+          <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1.5">Número de Celular</label>
+          <div className="flex gap-2">
+            <select 
+              name="countryCode" 
+              defaultValue={initialCountryCode}
+              className="px-3 py-2.5 bg-zinc-50 dark:bg-black border border-zinc-200 dark:border-zinc-800 rounded-xl outline-none text-sm focus:ring-2 focus:ring-black"
+            >
+              <option value="+51">+51</option>
+              <option value="+1">+1</option>
+              <option value="+34">+34</option>
+              <option value="+52">+52</option>
+              <option value="+54">+54</option>
+              <option value="+56">+56</option>
+              <option value="+57">+57</option>
+            </select>
+            <input
+              name="phoneNumber"
+              defaultValue={initialPhoneNumber}
+              className="flex-1 px-4 py-2.5 bg-zinc-50 dark:bg-black border border-zinc-200 dark:border-zinc-800 rounded-xl focus:ring-2 focus:ring-black dark:focus:ring-white transition-all outline-none text-sm"
+              placeholder="987654321"
+            />
+          </div>
         </div>
         <div>
-          <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1.5">Address</label>
+          <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1.5">Ubicación / Dirección</label>
           <input
             name="address"
             defaultValue={client?.address || ""}
             className="w-full px-4 py-2.5 bg-zinc-50 dark:bg-black border border-zinc-200 dark:border-zinc-800 rounded-xl focus:ring-2 focus:ring-black dark:focus:ring-white transition-all outline-none text-sm"
-            placeholder="Street, City ..."
+            placeholder="Calle, Ciudad, País..."
           />
         </div>
       </div>
@@ -102,7 +124,7 @@ export function ClientForm({ client, onSuccess }: ClientFormProps) {
         disabled={isPending}
         className="w-full py-3 bg-black dark:bg-white text-white dark:text-black font-bold rounded-xl hover:opacity-90 transition-all disabled:opacity-50 text-sm shadow-lg shadow-black/10 dark:shadow-white/5"
       >
-        {isPending ? "Saving..." : isEditing ? "Update Client" : "Create Client"}
+        {isPending ? "Guardando..." : isEditing ? "Actualizar Cliente" : "Crear Cliente"}
       </button>
     </form>
   );

@@ -17,15 +17,15 @@ export default async function TeamsPage() {
     <div className="space-y-6">
       <header className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold text-black dark:text-zinc-50">Work Units (Teams)</h1>
-          <p className="text-zinc-500 dark:text-zinc-400 mt-1">Organize your creative staff into functional teams.</p>
+          <h1 className="text-3xl font-bold text-black dark:text-zinc-50">Unidades de Trabajo (Equipos)</h1>
+          <p className="text-zinc-500 dark:text-zinc-400 mt-1">Organiza a tu personal creativo en equipos funcionales.</p>
         </div>
       </header>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         {/* Left: Create Team Form */}
         <div className="lg:col-span-4 p-6 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl shadow-sm h-fit">
-          <h2 className="text-lg font-bold mb-4">Create New Team</h2>
+          <h2 className="text-lg font-bold mb-4">Crear Nuevo Equipo</h2>
           <TeamForm />
         </div>
 
@@ -33,7 +33,7 @@ export default async function TeamsPage() {
         <div className="lg:col-span-8 space-y-6">
           {teams.length === 0 ? (
             <div className="p-12 text-center border-2 border-dashed border-zinc-200 dark:border-zinc-800 rounded-2xl">
-              <p className="text-zinc-500">No teams created yet.</p>
+              <p className="text-zinc-500">No hay equipos creados aún.</p>
             </div>
           ) : (
             teams.map(team => (
@@ -41,10 +41,10 @@ export default async function TeamsPage() {
                 <div className="flex justify-between items-start mb-6">
                   <div>
                     <h3 className="text-xl font-bold text-black dark:text-white">{team.name}</h3>
-                    <p className="text-sm text-zinc-500 mt-1">{team.description || "No description provided."}</p>
+                    <p className="text-sm text-zinc-500 mt-1">{team.description || "Sin descripción proporcionada."}</p>
                   </div>
                   <div className="text-[10px] font-bold uppercase tracking-widest text-zinc-400">
-                    {team.members.length} Members
+                    {team.members.length} Miembros
                   </div>
                 </div>
                 

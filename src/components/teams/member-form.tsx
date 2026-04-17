@@ -15,12 +15,13 @@ type FormState = {
 
 export function MemberForm({ onSuccess }: MemberFormProps) {
   async function handleSubmit(prevState: FormState, formData: FormData): Promise<FormState> {
+    const username = formData.get("username") as string;
     const data: MemberInput = {
       name: formData.get("name") as string,
       role: formData.get("role") as string,
-      email: formData.get("email") as string,
+      email: `${username}@publimax.com`,
       password: formData.get("password") as string,
-      systemRole: formData.get("systemRole") as "ADMIN" | "CREATIVE",
+      systemRole: "CREATIVE",
     };
 
     const result = await createMember(data);
@@ -40,7 +41,7 @@ export function MemberForm({ onSuccess }: MemberFormProps) {
   return (
     <form action={formAction} className="grid grid-cols-1 md:grid-cols-2 gap-4">
       <div className="md:col-span-2">
-        <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1">Full Name</label>
+        <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1">Nombre Completo</label>
         <input
           name="name"
           required
@@ -51,19 +52,21 @@ export function MemberForm({ onSuccess }: MemberFormProps) {
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1">Email Address</label>
-        <input
-          name="email"
-          type="email"
-          required
-          className="w-full px-4 py-2 bg-zinc-50 dark:bg-black border border-zinc-200 dark:border-zinc-800 rounded-lg outline-none focus:ring-2 focus:ring-black dark:focus:ring-white transition-all text-sm"
-          placeholder="juan@publimax.com"
-        />
+        <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1">Usuario Institucional</label>
+        <div className="flex items-center gap-2">
+          <input
+            name="username"
+            required
+            className="flex-1 px-4 py-2 bg-zinc-50 dark:bg-black border border-zinc-200 dark:border-zinc-800 rounded-lg outline-none focus:ring-2 focus:ring-black dark:focus:ring-white transition-all text-sm"
+            placeholder="juan.perez"
+          />
+          <span className="text-xs font-bold text-zinc-400">@publimax.com</span>
+        </div>
         {errors?.email && <p className="text-xs text-red-500 mt-1">{errors.email[0]}</p>}
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1">System Password</label>
+        <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1">Contraseña de Sistema</label>
         <input
           name="password"
           type="password"
@@ -75,32 +78,19 @@ export function MemberForm({ onSuccess }: MemberFormProps) {
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1">Specialized Role</label>
+        <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1">Rol Especializado</label>
         <select
           name="role"
           className="w-full px-4 py-2 bg-zinc-50 dark:bg-black border border-zinc-200 dark:border-zinc-800 rounded-lg outline-none focus:ring-2 focus:ring-black dark:focus:ring-white transition-all text-sm"
         >
-          <option value="">Select job role (Optional for Admin)</option>
-          <option value="Designer">Designer</option>
-          <option value="Video Editor">Video Editor</option>
-          <option value="Copywriter">Copywriter</option>
-          <option value="Creative Director">Creative Director</option>
-          <option value="Social Media Manager">Social Media Manager</option>
+          <option value="">Seleccionar rol...</option>
+          <option value="Diseñador">Diseñador</option>
+          <option value="Editor de Video">Editor de Video</option>
+          <option value="Redactor / Copy">Redactor / Copy</option>
+          <option value="Director Creativo">Director Creativo</option>
+          <option value="Gestor de Redes">Gestor de Redes</option>
         </select>
         {errors?.role && <p className="text-xs text-red-500 mt-1">{errors.role[0]}</p>}
-      </div>
-
-      <div>
-        <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1">System Permission</label>
-        <select
-          name="systemRole"
-          required
-          className="w-full px-4 py-2 bg-zinc-50 dark:bg-black border border-zinc-200 dark:border-zinc-800 rounded-lg outline-none focus:ring-2 focus:ring-black dark:focus:ring-white transition-all text-sm"
-        >
-          <option value="CREATIVE">Creative (Calendar Access)</option>
-          <option value="ADMIN">Admin (Full Dashboard)</option>
-        </select>
-        {errors?.systemRole && <p className="text-xs text-red-500 mt-1">{errors.systemRole[0]}</p>}
       </div>
 
       <div className="md:col-span-2 mt-2">
@@ -108,7 +98,7 @@ export function MemberForm({ onSuccess }: MemberFormProps) {
           disabled={isPending}
           className="w-full py-2.5 bg-black dark:bg-white text-white dark:text-black font-bold rounded-lg hover:opacity-90 disabled:opacity-50 transition-all text-sm"
         >
-          {isPending ? "Adding Member..." : "Create Member Profile"}
+          {isPending ? "Agregando Miembro..." : "Crear Perfil de Miembro"}
         </button>
       </div>
     </form>

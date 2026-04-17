@@ -3,14 +3,15 @@ import { CampaignTable } from "@/components/campaigns/campaign-table";
 import { NewCampaignButton } from "@/components/campaigns/new-campaign-button";
 
 export default async function CampaignsPage() {
-  // Fetch campaigns with their related clients, deliverables and invoices
+  // Fetch campaigns with their related clients, deliverables, invoices and moodboards
   const campaigns = await prisma.campaign.findMany({
     include: { 
       client: true,
       deliverables: true,
       invoices: {
         orderBy: { dueDate: 'desc' }
-      }
+      },
+      moodboards: true
     },
     orderBy: { createdAt: 'desc' },
   });

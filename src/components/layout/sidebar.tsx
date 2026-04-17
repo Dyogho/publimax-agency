@@ -31,12 +31,20 @@ export function Sidebar({ role }: SidebarProps) {
 
         {/* Creative only dashboard link */}
         {!isAdmin && (
-          <Link 
-            href="/creative" 
-            className="block px-4 py-2 text-sm font-medium text-zinc-950 dark:text-zinc-50 hover:bg-zinc-100 dark:hover:bg-zinc-900 rounded-lg transition-colors"
-          >
-            Creative Dashboard
-          </Link>
+          <>
+            <Link 
+              href="/creative" 
+              className="block px-4 py-2 text-sm font-medium text-zinc-950 dark:text-zinc-50 hover:bg-zinc-100 dark:hover:bg-zinc-900 rounded-lg transition-colors"
+            >
+              Creative Dashboard
+            </Link>
+            <Link 
+              href="/creative/moodboards" 
+              className="block px-4 py-2 text-sm font-medium text-zinc-500 hover:text-zinc-950 dark:text-zinc-400 dark:hover:text-zinc-50 transition-colors"
+            >
+              Moodboards
+            </Link>
+          </>
         )}
 
         {isAdmin && (
@@ -64,6 +72,12 @@ export function Sidebar({ role }: SidebarProps) {
               className="block px-4 py-2 text-sm font-medium text-zinc-500 hover:text-zinc-950 dark:text-zinc-400 dark:hover:text-zinc-50 transition-colors"
             >
               Reports
+            </Link>
+            <Link 
+              href="/admin/campaigns" 
+              className="block px-4 py-2 text-sm font-medium text-zinc-500 hover:text-zinc-950 dark:text-zinc-400 dark:hover:text-zinc-50 transition-colors"
+            >
+              Moodboards (Admin)
             </Link>
           </>
         )}

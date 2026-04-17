@@ -5,6 +5,12 @@ import { campaignSchema, type CampaignInput } from "@/lib/validations/campaign";
 import { revalidatePath } from "next/cache";
 import { formatActionError } from "@/lib/utils/errors";
 
+import { randomBytes } from "node:crypto";
+
+function generateRandomSlug() {
+  return randomBytes(6).toString('hex');
+}
+
 export async function createCampaign(data: CampaignInput) {
   const result = campaignSchema.safeParse(data);
 
@@ -13,9 +19,22 @@ export async function createCampaign(data: CampaignInput) {
   }
 
   try {
-    const campaign = await prisma.campaign.create({
-      data: result.data,
+    const campaign = await prisma.$transaction(async (tx) => {
+      const newCampaign = await tx.campaign.create({
+        data: result.data,
+      });
+
+      await tx.moodboard.create({
+        data: {
+          title: `Moodboard: ${newCampaign.name}`,
+          slug: generateRandomSlug(),
+          campaignId: newCampaign.id,
+        },
+      });
+
+      return newCampaign;
     });
+
     revalidatePath("/admin");
     revalidatePath("/admin/campaigns");
     return { success: true, data: campaign };

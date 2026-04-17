@@ -8,6 +8,107 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
+model Client {
+  id        String     @id @default(cuid())
+  name      String
+  email     String     @unique
+  phone     String?
+  address   String?
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  campaigns Campaign[]
+}
+
+model Campaign {
+  id             String         @id @default(cuid())
+  name           String
+  budget         Float
+  adsType        String
+  startDate      DateTime
+  endDate        DateTime
+  estimatedRoi   Float?
+  status         CampaignStatus @default(PLANNING)
+  clientId       String
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  color          String?        @default("#3b82f6")
+  expectedReach  Int?
+  targetAudience Int?
+  client         Client         @relation(fields: [clientId], references: [id])
+  deliverables   Deliverable[]
+  invoices       Invoice[]
+  moodboards     Moodboard[]
+  teams          Team[]         @relation("TeamCampaigns")
+}
+
+model Deliverable {
+  id          String            @id @default(cuid())
+  title       String
+  type        DeliverableType
+  status      DeliverableStatus @default(PENDING)
+  campaignId  String
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  description String?
+  endDate     DateTime?
+  startDate   DateTime?
+  campaign    Campaign          @relation(fields: [campaignId], references: [id])
+  invoices    Invoice[]
+  teams       Team[]            @relation("TeamDeliverables")
+}
+
+model TeamMember {
+  id         String     @id @default(cuid())
+  name       String
+  email      String     @unique
+  password   String
+  role       String
+  systemRole SystemRole @default(CREATIVE)
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+  teams      Team[]     @relation("TeamMembership")
+}
+
+model Team {
+  id           String        @id @default(cuid())
+  name         String
+  description  String?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  campaigns    Campaign[]    @relation("TeamCampaigns")
+  deliverables Deliverable[] @relation("TeamDeliverables")
+  members      TeamMember[]  @relation("TeamMembership")
+}
+
+model Invoice {
+  id            String        @id @default(cuid())
+  amount        Float
+  dueDate       DateTime
+  status        InvoiceStatus @default(PENDING)
+  campaignId    String
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  deliverableId String?
+  description   String?
+  type          BillingType   @default(MILESTONE)
+  campaign      Campaign      @relation(fields: [campaignId], references: [id])
+  deliverable   Deliverable?  @relation(fields: [deliverableId], references: [id])
+}
+
+model Moodboard {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  isLocked    Boolean  @default(false)
+  slug        String   @unique
+  urls        String[]
+  finalImage  String?
+  campaignId  String
+  campaign    Campaign @relation(fields: [campaignId], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
 enum CampaignStatus {
   PLANNING
   ACTIVE
@@ -38,105 +139,7 @@ enum BillingType {
   MONTHLY
 }
 
-
-model Client {
-  id        String     @id @default(cuid())
-  name      String
-  email     String     @unique
-  phone     String?
-  address   String?
-  campaigns Campaign[]
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
-}
-
-model Campaign {
-  id           String         @id @default(cuid())
-  name         String
-  budget       Float
-  adsType      String
-  startDate    DateTime
-  endDate      DateTime
-  estimatedRoi Float?
-  status       CampaignStatus @default(PLANNING)
-  color        String?        @default("#3b82f6")
-  targetAudience Int?
-  expectedReach  Int?
-  clientId     String
-  client       Client         @relation(fields: [clientId], references: [id])
-  deliverables Deliverable[]
-  teams        Team[]         @relation("TeamCampaigns")
-  invoices     Invoice[]
-  moodboards   Moodboard[]
-  createdAt    DateTime       @default(now())
-  updatedAt    DateTime       @updatedAt
-}
-
-model Deliverable {
-  id         String            @id @default(cuid())
-  title      String
-  description String?
-  type       DeliverableType
-  status     DeliverableStatus @default(PENDING)
-  startDate  DateTime?
-  endDate    DateTime?
-  campaignId String
-  campaign   Campaign          @relation(fields: [campaignId], references: [id])
-  teams      Team[]            @relation("TeamDeliverables")
-  invoices   Invoice[]
-  createdAt  DateTime          @default(now())
-  updatedAt  DateTime          @updatedAt
-}
-
 enum SystemRole {
   ADMIN
   CREATIVE
-}
-
-model TeamMember {
-  id         String     @id @default(cuid())
-  name       String
-  email      String     @unique
-  password   String     // Initial password for access
-  role       String     // Creative role (Designer, etc.)
-  systemRole SystemRole @default(CREATIVE)
-  teams      Team[]     @relation("TeamMembership")
-  createdAt  DateTime   @default(now())
-  updatedAt  DateTime   @updatedAt
-}
-
-model Team {
-  id          String       @id @default(cuid())
-  name        String
-  description String?
-  members     TeamMember[] @relation("TeamMembership")
-  campaigns   Campaign[]   @relation("TeamCampaigns")
-  deliverables Deliverable[] @relation("TeamDeliverables")
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
-}
-
-model Invoice {
-  id            String        @id @default(cuid())
-  amount        Float
-  dueDate       DateTime
-  description   String?
-  type          BillingType   @default(MILESTONE)
-  status        InvoiceStatus @default(PENDING)
-  campaignId    String
-  campaign      Campaign      @relation(fields: [campaignId], references: [id])
-  deliverableId String?
-  deliverable   Deliverable?  @relation(fields: [deliverableId], references: [id])
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
-}
-
-model Moodboard {
-  id         String   @id @default(cuid())
-  title      String
-  urls       String[] // Array of reference links
-  campaignId String
-  campaign   Campaign @relation(fields: [campaignId], references: [id])
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
 }

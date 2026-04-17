@@ -1,15 +1,19 @@
 "use client";
 
-import { type Campaign, type Client, type Deliverable, type Invoice } from "@prisma/client";
+import { type Campaign, type Client, type Deliverable, type Invoice, type Moodboard } from "@prisma/client";
 import { deleteCampaign } from "@/app/actions/campaigns";
 import { useState } from "react";
 import { BillingManager } from "../billing/billing-manager";
 import { ReachGauge } from "../reports/reach-gauge";
+import { ReferenceGrid } from "../moodboards/reference-grid";
+import { AddReferenceForm } from "../moodboards/add-reference-form";
+import { AdminMoodboardControls } from "../moodboards/admin-moodboard-controls";
 
 type CampaignWithExtras = Campaign & { 
   client: Client;
   deliverables: Deliverable[];
   invoices: Invoice[];
+  moodboards: Moodboard[];
 };
 
 interface CampaignTableProps {
@@ -19,6 +23,7 @@ interface CampaignTableProps {
 export function CampaignTable({ campaigns }: CampaignTableProps) {
   const [isDeleting, setIsDeleting] = useState<string | null>(null);
   const [activeBillingCampaign, setActiveBillingCampaign] = useState<CampaignWithExtras | null>(null);
+  const [activeMoodboardCampaign, setActiveMoodboardCampaign] = useState<CampaignWithExtras | null>(null);
 
   async function handleDelete(id: string) {
     if (!confirm("Are you sure you want to delete this campaign?")) return;
@@ -94,6 +99,12 @@ export function CampaignTable({ campaigns }: CampaignTableProps) {
                         Billing
                       </button>
                       <button 
+                        className="text-zinc-600 hover:text-black dark:text-zinc-400 dark:hover:text-white text-xs font-bold"
+                        onClick={() => setActiveMoodboardCampaign(campaign)}
+                      >
+                        Moodboard
+                      </button>
+                      <button 
                         disabled={isDeleting === campaign.id}
                         className="text-red-500 hover:text-red-600 text-xs font-medium disabled:opacity-50"
                         onClick={() => handleDelete(campaign.id)}
@@ -134,6 +145,69 @@ export function CampaignTable({ campaigns }: CampaignTableProps) {
                 className="px-6 py-2 text-sm font-bold text-zinc-500 hover:text-black transition-colors"
               >
                 Cerrar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Moodboard Management Modal */}
+      {activeMoodboardCampaign && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-3xl w-full max-w-4xl overflow-hidden shadow-2xl animate-in zoom-in-95 duration-200 flex flex-col max-h-[90vh]">
+            <div className="p-6 border-b border-zinc-100 dark:border-zinc-900 flex justify-between items-center bg-zinc-50/50 dark:bg-zinc-900/50">
+              <div>
+                <h2 className="text-xl font-bold tracking-tight uppercase">Lienzo Creativo</h2>
+                <p className="text-xs text-zinc-500">{activeMoodboardCampaign.name}</p>
+              </div>
+              <button 
+                onClick={() => setActiveMoodboardCampaign(null)}
+                className="p-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-full transition-colors"
+              >
+                ✕
+              </button>
+            </div>
+            
+            <div className="flex-1 overflow-y-auto p-8 space-y-8">
+              {activeMoodboardCampaign.moodboards[0] ? (
+                <>
+                  <AdminMoodboardControls 
+                    moodboardId={activeMoodboardCampaign.moodboards[0].id}
+                    isLocked={activeMoodboardCampaign.moodboards[0].isLocked}
+                    slug={activeMoodboardCampaign.moodboards[0].slug}
+                    finalImage={activeMoodboardCampaign.moodboards[0].finalImage}
+                  />
+
+                  {!activeMoodboardCampaign.moodboards[0].isLocked && (
+                    <div className="space-y-4">
+                      <p className="text-xs font-bold text-zinc-400 uppercase tracking-widest">Colaboración Interna</p>
+                      <AddReferenceForm moodboardId={activeMoodboardCampaign.moodboards[0].id} />
+                    </div>
+                  )}
+
+                  <div className="space-y-4">
+                    <p className="text-xs font-bold text-zinc-400 uppercase tracking-widest">Vista Previa de Referencias</p>
+                    <ReferenceGrid 
+                      moodboardId={activeMoodboardCampaign.moodboards[0].id}
+                      urls={activeMoodboardCampaign.moodboards[0].urls}
+                      isLocked={activeMoodboardCampaign.moodboards[0].isLocked}
+                      canEdit={true}
+                    />
+                  </div>
+                </>
+              ) : (
+                <div className="py-20 text-center space-y-4">
+                  <p className="text-zinc-500 italic">No se encontró moodboard para esta campaña.</p>
+                </div>
+              )}
+            </div>
+
+            <div className="p-6 border-t border-zinc-100 dark:border-zinc-900 flex justify-end">
+              <button 
+                onClick={() => setActiveMoodboardCampaign(null)}
+                className="px-8 py-2.5 bg-black dark:bg-white text-white dark:text-black rounded-2xl text-sm font-bold shadow-lg hover:opacity-90 transition-all"
+              >
+                Finalizar Gestión
               </button>
             </div>
           </div>

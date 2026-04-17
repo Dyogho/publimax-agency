@@ -20,7 +20,7 @@ async function MoodboardContent({ params }: PageProps) {
   const result = await getMoodboardBySlug(slug);
 
   if (!result) notFound();
-  
+
   // Handle restricted state
   if ("restricted" in result && result.restricted) {
     return (
@@ -39,8 +39,8 @@ async function MoodboardContent({ params }: PageProps) {
 
   // At this point we know result is the moodboard object
   // Since getMoodboardBySlug returns either null, { restricted: true }, or the moodboard
-  if ("restricted" in result) notFound(); 
-  
+  if ("restricted" in result) notFound();
+
   const board = result;
 
   return (
@@ -64,7 +64,7 @@ async function MoodboardContent({ params }: PageProps) {
           <h2 className="text-4xl font-bold tracking-tight">Lienzo de Inspiración</h2>
           <p className="text-lg text-zinc-500 max-w-2xl leading-relaxed">
             Hemos seleccionado estas referencias visuales y estilos para definir la dirección creativa de tu campaña.
-            Este moodboard representa la "vibra" y estética final del proyecto.
+            Este moodboard representa la vibra y estética final del proyecto.
           </p>
         </header>
 

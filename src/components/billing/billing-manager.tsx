@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { InvoiceForm } from "./invoice-form";
 import { Campaign, Deliverable, Invoice } from "@prisma/client";
+import { updateInvoiceStatus } from "@/app/actions/billing";
 
 interface BillingManagerProps {
   campaign: Campaign & { deliverables: Deliverable[]; invoices: Invoice[] };
@@ -10,9 +11,17 @@ interface BillingManagerProps {
 
 export function BillingManager({ campaign }: BillingManagerProps) {
   const [showForm, setShowForm] = useState(false);
+  const [isPending, startTransition] = useTransition();
 
   const totalInvoiced = campaign.invoices.reduce((sum, inv) => sum + inv.amount, 0);
   const percentInvoiced = Math.min(Math.round((totalInvoiced / campaign.budget) * 100), 100);
+
+  async function handleToggleStatus(id: string, currentStatus: string) {
+    const newStatus = currentStatus === "PENDING" ? "PAID" : "PENDING";
+    startTransition(async () => {
+      await updateInvoiceStatus(id, newStatus as any);
+    });
+  }
 
   return (
     <div className="space-y-6">
@@ -70,13 +79,19 @@ export function BillingManager({ campaign }: BillingManagerProps) {
                   </span>
                 </div>
               </div>
-              <div className="text-right">
+              <div className="text-right flex flex-col items-end gap-2">
                 <p className="text-sm font-bold">${invoice.amount.toLocaleString()}</p>
-                <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full ${
-                  invoice.status === 'PAID' ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'
-                }`}>
-                  {invoice.status}
-                </span>
+                <button
+                  disabled={isPending}
+                  onClick={() => handleToggleStatus(invoice.id, invoice.status)}
+                  className={`text-[9px] font-bold px-2 py-0.5 rounded-full transition-all hover:scale-105 active:scale-95 disabled:opacity-50 ${
+                    invoice.status === 'PAID' 
+                      ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' 
+                      : 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400'
+                  }`}
+                >
+                  {isPending ? '...' : invoice.status === 'PAID' ? 'PAGADO ✓' : 'MARCAR PAGADO'}
+                </button>
               </div>
             </div>
           ))

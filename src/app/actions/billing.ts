@@ -57,6 +57,7 @@ export async function updateInvoiceStatus(id: string, status: InvoiceStatus) {
       data: { status },
     });
     revalidatePath("/admin/billing");
+    revalidatePath("/admin/campaigns");
     return { success: true };
   } catch (e) {
     console.error("Error updating invoice:", e);

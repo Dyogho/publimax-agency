@@ -52,6 +52,7 @@ model Deliverable {
   description String?
   endDate     DateTime?
   startDate   DateTime?
+  deliveryUrl String?
   campaign    Campaign          @relation(fields: [campaignId], references: [id])
   invoices    Invoice[]
   teams       Team[]            @relation("TeamDeliverables")

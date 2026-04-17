@@ -30,7 +30,6 @@ export function Sidebar({ role }: SidebarProps) {
     : [
         { label: "Mi Dashboard", href: "/creative", icon: "🎨", group: "Creatividad" },
         { label: "Moodboards", href: "/creative/moodboards", icon: "✨", group: "Creatividad" },
-        { label: "Directorio", href: "/creative/team", icon: "📂", group: "Talento Humano" },
       ];
 
   const groupedItems = navItems.reduce((acc, item) => {

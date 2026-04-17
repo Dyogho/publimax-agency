@@ -9,3 +9,10 @@ Requerimientos:
 - [x] Equipo creativo asignado por campaña
 - [ ] Reporte ROI estimado (% alcance)
 - [ ] Moodboards compartibles
+
+Responsive Design Multi-dispositivo:
+100% responsive (mobile-first)
+Bootstrap/Tailwind o CSS Grid/Flexbox
+Tablets (768px), Desktop (1200px+)
+Touch-friendly en móviles
+PWA opcional (+puntos)

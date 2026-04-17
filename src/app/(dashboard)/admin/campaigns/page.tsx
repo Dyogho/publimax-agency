@@ -3,8 +3,6 @@ import { CampaignTable } from "@/components/campaigns/campaign-table";
 import { NewCampaignButton } from "@/components/campaigns/new-campaign-button";
 
 export default async function CampaignsPage() {
-  'use cache';
-  
   // Fetch campaigns with their related clients
   const campaigns = await prisma.campaign.findMany({
     include: { client: true },

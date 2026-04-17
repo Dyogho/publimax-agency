@@ -1,8 +1,6 @@
 import prisma from "@/lib/prisma";
 import { CalendarGrid } from "@/components/calendar/calendar-grid";
-
 export default async function DashboardPage() {
-  'use cache';
   let isConnected = false;
   let clientCount = 0;
   let campaignCount = 0;

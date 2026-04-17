@@ -3,7 +3,6 @@ import { ClientTable } from "@/components/clients/client-table";
 import { NewClientButton } from "@/components/clients/new-client-button";
 
 export default async function ClientsPage() {
-  'use cache';
   const clients = await prisma.client.findMany({
     orderBy: { createdAt: 'desc' },
   });

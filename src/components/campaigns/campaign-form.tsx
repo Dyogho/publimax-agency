@@ -28,6 +28,7 @@ export function CampaignForm({ clients, campaign, onSuccess }: CampaignFormProps
       endDate: new Date(formData.get("endDate") as string),
       clientId: formData.get("clientId") as string,
       status: (formData.get("status") as CampaignStatus) || CampaignStatus.PLANNING,
+      color: formData.get("color") as string,
     };
 
     const result = isEditing 
@@ -100,6 +101,19 @@ export function CampaignForm({ clients, campaign, onSuccess }: CampaignFormProps
           <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1.5">End Date</label>
           <input name="endDate" type="date" defaultValue={campaign?.endDate?.toISOString().split('T')[0]} required className="w-full px-4 py-2.5 bg-zinc-50 dark:bg-black border border-zinc-200 dark:border-zinc-800 rounded-xl outline-none text-sm shadow-sm focus:ring-2 focus:ring-black dark:focus:ring-white transition-all" />
           {errors?.endDate && <p className="mt-1 text-xs text-red-500">{errors.endDate[0]}</p>}
+        </div>
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1.5">Campaign Color</label>
+        <div className="flex items-center gap-3">
+          <input 
+            name="color" 
+            type="color" 
+            defaultValue={campaign?.color || "#3b82f6"} 
+            className="w-12 h-12 bg-transparent border-0 rounded-lg cursor-pointer" 
+          />
+          <span className="text-xs text-zinc-500">Pick a color for the calendar timeline</span>
         </div>
       </div>
 

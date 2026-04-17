@@ -3,7 +3,6 @@ import { MemberTable } from "@/components/teams/member-table";
 import { MemberForm } from "@/components/teams/member-form";
 
 export default async function TeamDirectoryPage() {
-  'use cache';
   const members = await prisma.teamMember.findMany({
     orderBy: { name: 'asc' },
   });

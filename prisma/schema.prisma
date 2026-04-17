@@ -53,6 +53,7 @@ model Campaign {
   endDate      DateTime
   estimatedRoi Float?
   status       CampaignStatus @default(PLANNING)
+  color        String?        @default("#3b82f6")
   clientId     String
   client       Client         @relation(fields: [clientId], references: [id])
   deliverables Deliverable[]
@@ -66,10 +67,14 @@ model Campaign {
 model Deliverable {
   id         String            @id @default(cuid())
   title      String
+  description String?
   type       DeliverableType
   status     DeliverableStatus @default(PENDING)
+  startDate  DateTime?
+  endDate    DateTime?
   campaignId String
   campaign   Campaign          @relation(fields: [campaignId], references: [id])
+  teams      Team[]            @relation("TeamDeliverables")
   createdAt  DateTime          @default(now())
   updatedAt  DateTime          @updatedAt
 }
@@ -97,6 +102,7 @@ model Team {
   description String?
   members     TeamMember[] @relation("TeamMembership")
   campaigns   Campaign[]   @relation("TeamCampaigns")
+  deliverables Deliverable[] @relation("TeamDeliverables")
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
 }

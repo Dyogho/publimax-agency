@@ -3,8 +3,6 @@ import { TeamForm } from "@/components/teams/team-form";
 import { TeamMemberManager } from "@/components/teams/team-member-manager";
 
 export default async function TeamsPage() {
-  'use cache';
-  
   const [teams, availableMembers] = await Promise.all([
     prisma.team.findMany({
       include: { members: true },

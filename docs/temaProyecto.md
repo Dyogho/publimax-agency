@@ -5,10 +5,10 @@ Requerimientos:
 
 - [x] Gestión campañas (cliente, tipo ads, presupuesto, fechas)
 - [x] Calendario entregables (banners, videos, copys)
-- [ ] Facturación por hitos/mensual
+- [x] Facturación por hitos/mensual
 - [x] Equipo creativo asignado por campaña
 - [x] Reporte ROI estimado (% alcance)
-- [ ] Moodboards compartibles
+- [x] Moodboards compartibles
 
 Responsive Design Multi-dispositivo:
 100% responsive (mobile-first)
